@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">Newzy</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="name">XYZ</string>
+    <string name="id">123</string>
+
+</resources>

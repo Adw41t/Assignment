@@ -1,0 +1,21 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="com.projects.assignment.MainActivity|com.projects.assignment.UserActivity|com.projects.assignment.NewsActivity"
+    >
+    <item
+        android:id="@+id/action_my_prof"
+        app:showAsAction="always"
+        android:title="My Profile"
+        android:icon="@drawable/myprof" />
+
+    <item
+        android:id="@+id/action_login"
+        app:showAsAction="ifRoom"
+        android:title="Login"/>
+    <item
+        android:id="@+id/action_signo"
+        app:showAsAction="collapseActionView"
+        android:title="Sign Out"/>
+
+</menu>
