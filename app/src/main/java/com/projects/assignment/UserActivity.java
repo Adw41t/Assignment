@@ -141,15 +141,20 @@ public class UserActivity extends AppCompatActivity {
 
         MenuItem item = menu.findItem(R.id.action_login);
         MenuItem item1 = menu.findItem(R.id.action_my_prof);
+        MenuItem item2 = menu.findItem(R.id.action_signo);
         if(u==null) {
             item.setVisible(true);
             item.setEnabled(true);
             item1.setVisible(false);
             item1.setEnabled(false);
+            item2.setVisible(false);
+            item2.setEnabled(false);
         }
         else{
             item1.setVisible(true);
             item1.setEnabled(true);
+            item2.setVisible(true);
+            item2.setEnabled(true);
             item.setVisible(false);
             item.setEnabled(false);
         }
