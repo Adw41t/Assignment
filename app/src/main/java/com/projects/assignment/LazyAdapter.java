@@ -142,7 +142,9 @@ public class LazyAdapter extends BaseAdapter{
         if (cho == 1) {
             persons = personList.get(position);
             holder.t1.setText(persons.get("title"));
-            holder.t2.setText(persons.get("des"));
+            if(persons.get("des")!=null) {
+                holder.t2.setText(persons.get("des"));
+            }
             holder.t1.setTag(persons);
             imageLoader.DisplayImage(persons.get("urlToImage"),holder.iv);
         }
