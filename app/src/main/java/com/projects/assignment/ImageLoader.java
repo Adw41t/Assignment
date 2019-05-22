@@ -71,7 +71,6 @@ public class ImageLoader {
         //from SD cache
         Bitmap b = decodeFile(f);
         if(b!=null) {
-            System.out.println("Got from cache");
             return b;
         }
         else{
@@ -93,7 +92,7 @@ public class ImageLoader {
         //from SD cache
         Bitmap b = decodeFile(f);
         if(b!=null) {
-            System.out.println("Got from cache");
+
             return b;
         }
         //from web
@@ -109,7 +108,6 @@ public class ImageLoader {
             Utils.CopyStream(is, os);
             os.close();
             bitmap = decodeFile(f);
-            System.out.println("Not from cache");
             return bitmap;
         } catch (Throwable ex){
             ex.printStackTrace();

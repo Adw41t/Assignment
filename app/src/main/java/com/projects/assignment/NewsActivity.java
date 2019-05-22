@@ -1,15 +1,11 @@
 package com.projects.assignment;
 
 import android.content.Intent;
-import android.graphics.Color;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.net.Uri;
-import android.os.Build;
-import android.support.annotation.NonNull;
-import android.support.design.widget.FloatingActionButton;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
@@ -78,7 +74,10 @@ public class NewsActivity extends AppCompatActivity {
             FirebaseDatabase.getInstance().getReference().child(u.getUid()).child(key).setValue(n).addOnSuccessListener(new OnSuccessListener<Void>() {
                 @Override
                 public void onSuccess(Void aVoid) {
-                    System.out.println("Bookmarked");
+                    Toast.makeText(NewsActivity.this,
+                            "Bookmarked!",
+                            Toast.LENGTH_LONG)
+                            .show();
                 }
             });
         }

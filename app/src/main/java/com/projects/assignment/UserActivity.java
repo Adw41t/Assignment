@@ -4,10 +4,10 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.support.v7.widget.CardView;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -30,13 +30,11 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
 
 public class UserActivity extends AppCompatActivity {
-        FirebaseUser u;
-        DatabaseReference d;
+    FirebaseUser u;
+    DatabaseReference d;
     ArrayList<HashMap<String, String>> personList;
     ListView list;
     LazyAdapter adapter;
@@ -107,14 +105,12 @@ public class UserActivity extends AppCompatActivity {
         list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                System.out.println("Item clicked "+position);
                 RelativeLayout parentrow = (RelativeLayout) view;
                 CardView c=(CardView)parentrow.getChildAt(0);
                 parentrow=(RelativeLayout)c.getChildAt(0);
                 TextView im = (TextView) parentrow.getChildAt(1);
                 HashMap<String,String> persons = new HashMap<String,String>();
                 persons= (HashMap<String, String>) im.getTag();
-                System.out.println("url= "+persons.get("url"));
                 Intent in=new Intent(UserActivity.this,NewsActivity.class);
                 in.putExtra("url",persons.get("url"));
                 in.putExtra("urlToImage",persons.get("urlToImage"));
@@ -182,8 +178,6 @@ public class UserActivity extends AppCompatActivity {
                             public void onComplete(@NonNull Task<Void> task) {
                                 // ...
                                 Toast.makeText(UserActivity.this, "Signed out", Toast.LENGTH_SHORT).show();
-                                /*Intent in = new Intent(UserActivity.this, MainActivity.class);
-                                startActivity(in);*/
                                 u = FirebaseAuth.getInstance().getCurrentUser();
                                 invalidateOptionsMenu();
                             }

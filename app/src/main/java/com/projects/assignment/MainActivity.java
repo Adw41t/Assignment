@@ -1,7 +1,6 @@
 package com.projects.assignment;
 
 import android.Manifest;
-import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
@@ -12,12 +11,10 @@ import android.support.design.widget.TabLayout;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.Toast;
 
 import com.firebase.ui.auth.AuthUI;
@@ -26,21 +23,14 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.Query;
 
-import org.json.JSONArray;
-
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
     int SIGN_IN_REQUEST_CODE = 123;
     private static final String TAG = MainActivity.class.getSimpleName();
-    ProgressDialog pd;
     FirebaseUser u;
     private Toolbar toolbar;
     private TabLayout tabLayout;
@@ -58,8 +48,6 @@ public class MainActivity extends AppCompatActivity {
             FirebaseDatabase.getInstance().setPersistenceEnabled(true);
             calledAlready = true;
         }
-        pd = new ProgressDialog(MainActivity.this);
-        pd.setMessage("Loading....");
         sharep = PreferenceManager.getDefaultSharedPreferences(this);
         edit = sharep.edit();
         toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -147,8 +135,6 @@ public class MainActivity extends AppCompatActivity {
                             public void onComplete(@NonNull Task<Void> task) {
                                 // ...
                                 Toast.makeText(MainActivity.this, "Signed out", Toast.LENGTH_SHORT).show();
-                               /* Intent in = new Intent(MainActivity.this, MainActivity.class);
-                                startActivity(in);*/
                                 u = FirebaseAuth.getInstance().getCurrentUser();
                                 invalidateOptionsMenu();
                             }

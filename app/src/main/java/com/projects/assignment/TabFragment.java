@@ -11,7 +11,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
@@ -24,14 +23,10 @@ import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Map;
 
 import javax.net.ssl.HttpsURLConnection;
 
@@ -67,7 +62,6 @@ public class TabFragment extends Fragment {
         View view=inflater.inflate(R.layout.fragment_tab, container, false);
         list = (ListView) view.findViewById(R.id.listView);
         ref=(ImageButton)view.findViewById(R.id.refresh);
-        System.out.println("title= "+title);
         GetJSON gj=new GetJSON();
         gj.execute("https://newsapi.org/v2/top-headlines?country=in&category="+title+"&apiKey=61c2f4d0cc364098afa1aecde3090ee7");
         return view;
@@ -79,15 +73,12 @@ public class TabFragment extends Fragment {
         list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                System.out.println("Item clicked "+position);
                 RelativeLayout parentrow = (RelativeLayout) view;
                 CardView c=(CardView)parentrow.getChildAt(0);
                 parentrow=(RelativeLayout)c.getChildAt(0);
                 TextView im = (TextView) parentrow.getChildAt(1);
-
                 HashMap<String,String> persons = new HashMap<String,String>();
                 persons= (HashMap<String, String>) im.getTag();
-                System.out.println("url= "+persons.get("url"));
                 Intent in=new Intent(getContext(),NewsActivity.class);
                 in.putExtra("url",persons.get("url"));
                 in.putExtra("urlToImage",persons.get("urlToImage"));
@@ -101,7 +92,6 @@ public class TabFragment extends Fragment {
         ref.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                System.out.println("Refresh clicked");
                 GetJSON gj=new GetJSON();
                 gj.execute("https://newsapi.org/v2/top-headlines?country=in&category="+title+"&apiKey=61c2f4d0cc364098afa1aecde3090ee7");
 
@@ -139,9 +129,7 @@ public class TabFragment extends Fragment {
                 conn.setRequestMethod("GET");
                 conn.setDoInput(true);
                 //conn.setDoOutput(true);
-                System.out.println("conn= "+conn.getRequestMethod());
                 int responseCode = conn.getResponseCode();
-                System.out.println("responsecode= "+conn.getResponseCode());
                 if (responseCode == HttpsURLConnection.HTTP_OK) {
 
                     // HttpURLConnection con = (HttpURLConnection) url.openConnection();
@@ -167,16 +155,13 @@ public class TabFragment extends Fragment {
         protected void onPostExecute(String s) {
             super.onPostExecute(s);
             loading.dismiss();
-            System.out.println("s= "+s);
             personList = new ArrayList<HashMap<String, String>>();
             if (s == null ) {
                 Toast.makeText(getContext(),"Can't connect to server",Toast.LENGTH_SHORT).show();
             } else {
-                    System.out.println("else s= "+s);
                     try {
                         JSONObject jsonObject = new JSONObject(s);
                         users = jsonObject.getJSONArray("articles");
-                        System.out.println("users.length= " + users.length());
                         for (int i = 0; i < users.length(); i++) {
                             JSONObject c = users.getJSONObject(i);
                             HashMap<String, String> persons = new HashMap<String, String>();
