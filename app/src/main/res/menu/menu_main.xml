@@ -8,7 +8,11 @@
         app:showAsAction="always"
         android:title="My Profile"
         android:icon="@drawable/myprof" />
-
+    <item
+        android:id="@+id/action_day_night"
+        app:showAsAction="always"
+        android:title="Theme"
+        android:icon="@drawable/ic_twotone_brightness_6_24" />
     <item
         android:id="@+id/action_login"
         app:showAsAction="ifRoom"

@@ -1,20 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+    android:layout_width="match_parent"
+    android:id="@+id/tab_fragment_swipeRefresh"
+    android:layout_height="match_parent"
+    xmlns:android="http://schemas.android.com/apk/res/android" >
+<LinearLayout
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <ImageButton
+<!--    <ImageButton
         android:id="@+id/refresh"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="end"
-        android:background="@android:drawable/ic_menu_rotate" />
-<ListView
-    android:id="@+id/listView"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:divider="@null">
-</ListView>
+        android:background="@drawable/ic_baseline_refresh_24" />-->
 
+    <androidx.recyclerview.widget.RecyclerView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/recyclerNews"
+        />
 </LinearLayout>
+</androidx.swiperefreshlayout.widget.SwipeRefreshLayout>

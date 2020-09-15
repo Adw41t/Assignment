@@ -1,22 +1,22 @@
-package com.projects.assignment;
+package com.projects.assignment.ui;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.support.annotation.NonNull;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.CardView;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ListView;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatDelegate;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.firebase.ui.auth.AuthUI;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -28,16 +28,20 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.projects.assignment.R;
+import com.projects.assignment.adapters.NewsRecyclerAdapter;
+import com.projects.assignment.models.Article;
+import com.projects.assignment.models.news;
 
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.List;
 
 public class UserActivity extends AppCompatActivity {
     FirebaseUser u;
     DatabaseReference d;
-    ArrayList<HashMap<String, String>> personList;
-    ListView list;
-    LazyAdapter adapter;
+    List<Article> list;
+    RecyclerView recyclerView;
+    NewsRecyclerAdapter adapter;
     String uid,name;
     SharedPreferences sharep;
     SharedPreferences.Editor edit;
@@ -49,8 +53,8 @@ public class UserActivity extends AppCompatActivity {
         sharep = PreferenceManager.getDefaultSharedPreferences(this);
         edit = sharep.edit();
 
-        personList = new ArrayList<HashMap<String, String>>();
-        list=(ListView)findViewById(R.id.listView1);
+        recyclerView=(RecyclerView) findViewById(R.id.user_RecyclerNews);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
         if(isNetworkAvailable()) {
             u = FirebaseAuth.getInstance().getCurrentUser();
             if (u != null) {
@@ -67,59 +71,34 @@ public class UserActivity extends AppCompatActivity {
         }
         TextView t=(TextView)findViewById(R.id.welcome);
         t.setText("Welcome "+name+" !!");
-            d=FirebaseDatabase.getInstance().getReference();
-
-            d.child(uid).addListenerForSingleValueEvent(new ValueEventListener() {
-                @Override
-                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                    for (DataSnapshot postSnapshot : dataSnapshot.getChildren()) {
-                        System.out.println(postSnapshot.getValue());
-                        news n=postSnapshot.getValue(news.class);
-                        if(n!=null){
-                            HashMap<String, String> persons = new HashMap<String, String>();
-                            persons.put("title", n.getTitle());
-                            persons.put("des", n.getDes());
-                            persons.put("url", n.getUrl());
-                            persons.put("urlToImage", n.getUrlToImg());
-                            persons.put("publishedAt", n.getPublishedAt());
-                            personList.add(persons);
-                        }
-                    }
-
-                    if (personList.size() > 0) {
-                        adapter = new LazyAdapter(UserActivity.this, personList, 1);
-                        list.setAdapter(adapter);
-                    }
-                    else{
-                        Toast.makeText(UserActivity.this,"No Bookmarks",Toast.LENGTH_SHORT).show();
-                    }
-                }
-
-                @Override
-                public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                }
-            });
-            d.child(uid).keepSynced(true);
-
-        list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        list=new ArrayList<Article>();
+        d=FirebaseDatabase.getInstance().getReference();
+        d.child(uid).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                RelativeLayout parentrow = (RelativeLayout) view;
-                CardView c=(CardView)parentrow.getChildAt(0);
-                parentrow=(RelativeLayout)c.getChildAt(0);
-                TextView im = (TextView) parentrow.getChildAt(1);
-                HashMap<String,String> persons = new HashMap<String,String>();
-                persons= (HashMap<String, String>) im.getTag();
-                Intent in=new Intent(UserActivity.this,NewsActivity.class);
-                in.putExtra("url",persons.get("url"));
-                in.putExtra("urlToImage",persons.get("urlToImage"));
-                in.putExtra("title",persons.get("title"));
-                in.putExtra("des",persons.get("description"));
-                in.putExtra("publishedAt",persons.get("publishedAt"));
-                startActivity(in);
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                for (DataSnapshot postSnapshot : dataSnapshot.getChildren()) {
+                    news n=postSnapshot.getValue(news.class);
+                    if(n!=null) {
+                        Article article=new Article(n.getArticleId(),"","",n.getDes(),n.getPublishedAt(),null,n.getTitle(),n.getUrl(),n.getUrlToImg(),"");
+                        list.add(article);
+                    }
+                }
+
+                if (list.size() > 0) {
+                    adapter=new NewsRecyclerAdapter(UserActivity.this,list);
+                    recyclerView.setAdapter(adapter);
+                }
+                else{
+                    Toast.makeText(UserActivity.this,"No Bookmarks",Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
             }
         });
+        d.child(uid).keepSynced(true);
     }
     private boolean isNetworkAvailable() {
         ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService( CONNECTIVITY_SERVICE );
@@ -183,6 +162,19 @@ public class UserActivity extends AppCompatActivity {
                             }
                         });
                 //return true;
+                break;
+            case R.id.action_day_night:
+                boolean dn=sharep.getBoolean(getString(R.string.dayNightTheme),true);
+                if(dn) {
+                    AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
+                    edit.putBoolean(getString(R.string.dayNightTheme),false).apply();
+                    item.getIcon().setTint(Color.WHITE);
+                }
+                else{
+                    AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
+                    edit.putBoolean(getString(R.string.dayNightTheme),true).apply();
+                    item.getIcon().setTint(Color.BLACK);
+                }
                 break;
         }
         return super.onOptionsItemSelected(item);

@@ -1,4 +1,4 @@
-package com.projects.assignment;
+package com.projects.assignment.models;
 
 public class news {
 
@@ -7,17 +7,18 @@ public class news {
     String url;
     String urlToImg;
     String publishedAt;
-
+    int articleId;
     public news(){
 
     }
 
-    public news(String t,String d,String u,String img,String p){
+    public news(String t,String d,String u,String img,String p,int articleId){
         title=t;
         des=d;
         url=u;
         urlToImg=img;
         publishedAt=p;
+        this.articleId=articleId;
     }
 
     public String getTitle() {
@@ -58,5 +59,13 @@ public class news {
 
     public void setPublishedAt(String publishedAt) {
         this.publishedAt = publishedAt;
+    }
+
+    public int getArticleId() {
+        return articleId;
+    }
+
+    public void setArticleId(int articleId) {
+        this.articleId = articleId;
     }
 }

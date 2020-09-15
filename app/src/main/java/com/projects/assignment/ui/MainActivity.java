@@ -1,117 +1,72 @@
-package com.projects.assignment;
+package com.projects.assignment.ui;
 
 import android.content.Intent;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
+import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.v7.app.AppCompatActivity;
+import android.preference.PreferenceManager;
 import android.util.Log;
-import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.webkit.WebSettings;
-import android.webkit.WebView;
-import android.webkit.WebViewClient;
-import android.widget.ImageButton;
 import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatDelegate;
+import androidx.appcompat.widget.Toolbar;
+import androidx.viewpager2.widget.ViewPager2;
 
 import com.firebase.ui.auth.AuthUI;
 import com.firebase.ui.auth.IdpResponse;
 import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.material.tabs.TabLayout;
+import com.google.android.material.tabs.TabLayoutMediator;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.FirebaseDatabase;
+import com.projects.assignment.R;
+import com.projects.assignment.adapters.ViewPagerAdapter;
 
 import java.util.Arrays;
 import java.util.List;
 
-public class NewsActivity extends AppCompatActivity {
-    ImageButton fab;
-    WebView webView;
-    FirebaseUser u;
+public class MainActivity extends AppCompatActivity {
     int SIGN_IN_REQUEST_CODE = 123;
     private static final String TAG = MainActivity.class.getSimpleName();
-    Intent in;
+    FirebaseUser u;
+    SharedPreferences sharep;
+    SharedPreferences.Editor edit;
+    static boolean calledAlready = false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_news);
-        fab=(ImageButton) findViewById(R.id.fab);
-        fab.setBackgroundResource(android.R.drawable.btn_star_big_off);
-         in=getIntent();
-        String url=in.getStringExtra("url");
+        setContentView(R.layout.activity_main);
+        if (!calledAlready)
+        {
+            FirebaseDatabase.getInstance().setPersistenceEnabled(true);
+            calledAlready = true;
+        }
+        sharep = PreferenceManager.getDefaultSharedPreferences(this);
+        edit = sharep.edit();
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        ViewPager2 viewPager = (ViewPager2) findViewById(R.id.viewpager);
+        viewPager.setPageTransformer(new DepthPageTransformer());
+        ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager(),getLifecycle());
+        viewPager.setAdapter(adapter);
+        TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
+        new TabLayoutMediator(tabLayout, viewPager,
+                (tab, position) -> tab.setText(adapter.title[position])
+        ).attach();
         u = FirebaseAuth.getInstance().getCurrentUser();
-
-        if(u==null){
-            fab.setVisibility(View.INVISIBLE);
-            fab.setEnabled(false);
+        if(u!=null){
+            edit.putString(getString(R.string.name),u.getDisplayName());
+            edit.putString(getString(R.string.id),u.getUid());
+            edit.apply();
         }
 
-        webView = (WebView) findViewById(R.id.webview);
-        webView.getSettings().setAppCacheMaxSize( 5 * 1024 * 1024 ); // 5MB
-        webView.getSettings().setAppCachePath( getApplicationContext().getCacheDir().getAbsolutePath() );
-        webView.getSettings().setAllowFileAccess( true );
-        webView.getSettings().setAppCacheEnabled( true );
-        webView.getSettings().setJavaScriptEnabled( true );
-        webView.setWebViewClient(new MyWebViewClient());
-        webView.getSettings().setCacheMode( WebSettings.LOAD_DEFAULT ); // load online by default
-
-        if ( !isNetworkAvailable() ) { // loading offline
-            webView.getSettings().setCacheMode( WebSettings.LOAD_CACHE_ELSE_NETWORK );
-        }
-        if(url!=null)
-        webView.loadUrl(url);
     }
-    public void bookmark(View view){
-        fab.setBackgroundResource(android.R.drawable.btn_star_big_on);
-        if(u!=null) {
-            news n = new news(in.getStringExtra("title"), in.getStringExtra("des"), in.getStringExtra("url"), in.getStringExtra("urlToImage"), in.getStringExtra("publishedAt"));
-            String key = FirebaseDatabase.getInstance().getReference().child(u.getUid()).push().getKey();
-            FirebaseDatabase.getInstance().getReference().child(u.getUid()).child(key).setValue(n).addOnSuccessListener(new OnSuccessListener<Void>() {
-                @Override
-                public void onSuccess(Void aVoid) {
-                    Toast.makeText(NewsActivity.this,
-                            "Bookmarked!",
-                            Toast.LENGTH_LONG)
-                            .show();
-                }
-            });
-        }
-    }
-
-    private boolean isNetworkAvailable() {
-        ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService( CONNECTIVITY_SERVICE );
-        NetworkInfo activeNetworkInfo = null;
-        if (connectivityManager != null) {
-            activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
-        }
-        return activeNetworkInfo != null && activeNetworkInfo.isConnected();
-    }
-    private class MyWebViewClient extends WebViewClient {
-        @Override
-        public boolean shouldOverrideUrlLoading(WebView view, String url) {
-            if(url!=null)
-                view.loadUrl(url);
-            return true;
-        }
-    }
-    @Override
-    public boolean onKeyDown(int keyCode, KeyEvent event) {
-        // Check if the key event was the Back button and if there's history
-        if ((keyCode == KeyEvent.KEYCODE_BACK) && webView.canGoBack()) {
-            webView.goBack();
-            return true;
-        }
-        // If it wasn't the Back key or there's no web page history, bubble up to the default
-        // system behavior (probably exit the activity)
-        return super.onKeyDown(keyCode, event);
-    }
-
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
 
@@ -146,10 +101,7 @@ public class NewsActivity extends AppCompatActivity {
         Intent in;
         switch(id) {
             case R.id.action_my_prof:
-                in = new Intent(NewsActivity.this, UserActivity.class);
-            /*in.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
-            in.setFlags(Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS);
-            in.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);*/
+                in = new Intent(MainActivity.this, UserActivity.class);
                 startActivity(in);
                 break;
             case R.id.action_login:
@@ -164,7 +116,7 @@ public class NewsActivity extends AppCompatActivity {
                             AuthUI.getInstance()
                                     .createSignInIntentBuilder()
                                     .setAvailableProviders(providers)
-                                    .setLogo(R.drawable.ic_launcher_background)      // Set logo drawable
+                                    .setLogo(R.mipmap.ic_launcher_round)      // Set logo drawable
                                     .build(),
                             SIGN_IN_REQUEST_CODE
                     );
@@ -176,14 +128,23 @@ public class NewsActivity extends AppCompatActivity {
                         .addOnCompleteListener(new OnCompleteListener<Void>() {
                             public void onComplete(@NonNull Task<Void> task) {
                                 // ...
-                                Toast.makeText(NewsActivity.this, "Signed out", Toast.LENGTH_SHORT).show();
-                                /*Intent in = new Intent(NewsActivity.this, MainActivity.class);
-                                startActivity(in);*/
+                                Toast.makeText(MainActivity.this, "Signed out", Toast.LENGTH_SHORT).show();
                                 u = FirebaseAuth.getInstance().getCurrentUser();
                                 invalidateOptionsMenu();
                             }
                         });
                 //return true;
+            break;
+            case R.id.action_day_night:
+                boolean dn=sharep.getBoolean(getString(R.string.dayNightTheme),true);
+                if(dn) {
+                    AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
+                    edit.putBoolean(getString(R.string.dayNightTheme),false).apply();
+                }
+                else{
+                    AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
+                    edit.putBoolean(getString(R.string.dayNightTheme),true).apply();
+                }
                 break;
         }
         return super.onOptionsItemSelected(item);
@@ -201,13 +162,12 @@ public class NewsActivity extends AppCompatActivity {
                         Toast.LENGTH_LONG)
                         .show();
                 u = FirebaseAuth.getInstance().getCurrentUser();
-                invalidateOptionsMenu();
-
+                    invalidateOptionsMenu();
             } else {
                 // Sign in failed
                 if (response == null) {
                     // User pressed back button
-                    Log.e(TAG, "Sign-in cancelled ");
+                    Log.e(TAG, "Sign-in cancelled: ");
                 }
 
                 if (response != null) {
@@ -227,8 +187,9 @@ public class NewsActivity extends AppCompatActivity {
 
 
                 // Close the app
-                // finish();
+               // finish();
             }
         }
     }
+
 }
