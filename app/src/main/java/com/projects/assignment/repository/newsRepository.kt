@@ -13,23 +13,16 @@ import kotlinx.coroutines.launch
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
+import javax.inject.Inject
 
-class newsRepository(
+class newsRepository @Inject constructor(
         private val articleDao:ArticleDao,
-        NEWS_API_BASE_URL:String
+        private val getNewsBuilder: getNews
 ) {
     private val  NEWS_API_KEY= BuildConfig.NEWS_API_KEY
-    private var getNewsBuilder: getNews
     var topHeadlinesLiveData: MutableLiveData<topHeadlines> = MutableLiveData()
 
     init {
-        getNewsBuilder= Retrofit.Builder()
-                .baseUrl(NEWS_API_BASE_URL)
-                .addConverterFactory(GsonConverterFactory.create())
-                .build()
-                .create(getNews::class.java)
         topHeadlinesLiveData.observeForever{
             persistInDb(it)
         }

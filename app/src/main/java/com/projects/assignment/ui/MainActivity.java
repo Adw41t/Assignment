@@ -30,6 +30,9 @@ import com.projects.assignment.adapters.ViewPagerAdapter;
 import java.util.Arrays;
 import java.util.List;
 
+import dagger.hilt.android.AndroidEntryPoint;
+
+@AndroidEntryPoint
 public class MainActivity extends AppCompatActivity {
     int SIGN_IN_REQUEST_CODE = 123;
     private static final String TAG = MainActivity.class.getSimpleName();

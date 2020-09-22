@@ -14,15 +14,16 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
-import com.projects.assignment.NewsApplication;
 import com.projects.assignment.R;
 import com.projects.assignment.adapters.NewsRecyclerAdapter;
 import com.projects.assignment.models.Article;
 import com.projects.assignment.viewmodels.NewsViewModel;
-import com.projects.assignment.viewmodels.NewsViewModelFactory;
 
 import java.util.List;
 
+import dagger.hilt.android.AndroidEntryPoint;
+
+@AndroidEntryPoint
 public class TabFragment extends Fragment {
 
     int position;
@@ -44,8 +45,10 @@ public class TabFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        position = getArguments().getInt("pos");
-        title=getArguments().getString("title");
+        if (getArguments() != null) {
+            position = getArguments().getInt("pos");
+            title=getArguments().getString("title");
+        }
     }
 
     @Override
@@ -57,10 +60,7 @@ public class TabFragment extends Fragment {
         recyclerView=view.findViewById(R.id.recyclerNews);
 
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        NewsViewModelFactory factory=
-                new NewsViewModelFactory(((NewsApplication)getActivity().getApplication()).getNewsDatabase().articleDao(),
-                        view.getContext().getString(R.string.NEWS_API_BASE_URL));
-        viewModel= new ViewModelProvider(this,factory).get(NewsViewModel.class);
+        viewModel= new ViewModelProvider(this).get(NewsViewModel.class);
         return view;
     }
 
