@@ -8,6 +8,7 @@ import com.projects.assignment.data.NewsDatabase
 import com.projects.assignment.repository.newsRepository
 import dagger.Module
 import dagger.Provides
+import dagger.hilt.EntryPoint
 import dagger.hilt.InstallIn
 import dagger.hilt.android.components.ApplicationComponent
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -54,4 +55,9 @@ class ApplicationModule {
     ): newsRepository{
         return newsRepository(articleDao,getNewsBuilder)
     }
+}
+@EntryPoint
+@InstallIn(ApplicationComponent::class)
+interface newsRepositoryFieldInjectEntryPoint {
+    fun newsRepo(): newsRepository
 }

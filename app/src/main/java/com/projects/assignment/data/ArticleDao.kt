@@ -22,4 +22,8 @@ interface ArticleDao {
 
     @Query("delete from newsArticle where category like :articleCategory")
     fun deleteArticlesByCategory(articleCategory: String)
+
+
+    @Query("select * from newsArticle LIMIT 1")
+    fun getTopArticle(): Article
 }

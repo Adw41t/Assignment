@@ -26,6 +26,7 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.FirebaseDatabase;
 import com.projects.assignment.R;
 import com.projects.assignment.adapters.ViewPagerAdapter;
+import com.projects.assignment.utils.DepthPageTransformer;
 
 import java.util.Arrays;
 import java.util.List;

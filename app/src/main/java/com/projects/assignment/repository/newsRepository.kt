@@ -2,6 +2,9 @@ package com.projects.assignment.repository
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.work.OneTimeWorkRequest
+import androidx.work.WorkManager
+import com.addy.newzshots.utils.NotificationWorker
 import com.projects.assignment.BuildConfig
 import com.projects.assignment.api.getNews
 import com.projects.assignment.data.ArticleDao
@@ -61,6 +64,40 @@ class newsRepository @Inject constructor(
                 articleDao.insert(article)
             }
         }
+    }
+
+    private fun persistInDbAndNotify(headlines : topHeadlines){
+        GlobalScope.launch(Dispatchers.IO){
+            deleteArticlesByCategory(headlines.category)
+            for (article in headlines.articles) {
+                article.category=headlines.category
+                articleDao.insert(article)
+            }
+            val workRequest = OneTimeWorkRequest.Builder(NotificationWorker::class.java)
+                    .build()
+            WorkManager.getInstance().enqueue(workRequest)
+        }
+    }
+
+    fun getTopGeneralHeadlines(country:String="in", category:String="General"){
+        getNewsBuilder.getTopHeadlines(country,category,NEWS_API_KEY)
+                .enqueue(object :Callback<topHeadlines>{
+                    override fun onResponse(call: Call<topHeadlines>, response: Response<topHeadlines>) {
+                        val topHeadlines=response.body()
+                        if(topHeadlines!=null) {
+                            topHeadlines.category = category
+                            persistInDbAndNotify(topHeadlines)
+                        }
+                    }
+
+                    override fun onFailure(call: Call<topHeadlines>, t: Throwable) {
+//                        topHeadlinesLiveData.postValue(null)
+                    }
+
+                })
+    }
+    fun getTopArticleFromDb1():Article{
+        return articleDao.getTopArticle()
     }
     private fun deleteArticlesByCategory(category:String?){
         if(category!=null)

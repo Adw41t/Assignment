@@ -1,4 +1,4 @@
-package com.projects.assignment.ui
+package com.projects.assignment.utils
 
 import android.view.View
 import androidx.viewpager2.widget.ViewPager2
