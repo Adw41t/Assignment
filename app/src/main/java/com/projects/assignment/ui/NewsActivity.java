@@ -2,10 +2,12 @@ package com.projects.assignment.ui;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
@@ -18,9 +20,6 @@ import android.webkit.WebViewClient;
 import android.widget.ImageButton;
 import android.widget.ProgressBar;
 import android.widget.Toast;
-
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
 
 import com.firebase.ui.auth.AuthUI;
 import com.firebase.ui.auth.IdpResponse;
@@ -37,6 +36,11 @@ import com.projects.assignment.models.news;
 import java.util.Arrays;
 import java.util.List;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.webkit.WebSettingsCompat;
+import androidx.webkit.WebViewFeature;
+
 public class NewsActivity extends AppCompatActivity {
     ImageButton fab;
     WebView webView;
@@ -46,6 +50,8 @@ public class NewsActivity extends AppCompatActivity {
     private static final String TAG = MainActivity.class.getSimpleName();
     Intent in;
     Article article;
+    SharedPreferences sharep;
+    boolean isDayMode;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -53,7 +59,8 @@ public class NewsActivity extends AppCompatActivity {
         fab=(ImageButton) findViewById(R.id.ib_bookmark);
         fab.setBackgroundResource(android.R.drawable.btn_star_big_off);
         progressBar_newsWebView=findViewById(R.id.progress_news_webview);
-
+        sharep = PreferenceManager.getDefaultSharedPreferences(this);
+        isDayMode = sharep.getBoolean(getString(R.string.dayNightTheme),true);
         in=getIntent();
         Bundle bundle=in.getBundleExtra(getString(R.string.articleBundle));
         if(bundle!=null)
@@ -85,8 +92,17 @@ public class NewsActivity extends AppCompatActivity {
         if ( !isNetworkAvailable() ) { // loading offline
             webView.getSettings().setCacheMode( WebSettings.LOAD_CACHE_ELSE_NETWORK );
         }
-        if(url!=null)
-        webView.loadUrl(url);
+
+        if (isDayMode && WebViewFeature.isFeatureSupported(WebViewFeature.FORCE_DARK)) {
+            WebSettingsCompat.setForceDark(webView.getSettings(),WebSettingsCompat.FORCE_DARK_OFF);
+        }
+        else if(!isDayMode && WebViewFeature.isFeatureSupported(WebViewFeature.FORCE_DARK)){
+            WebSettingsCompat.setForceDark(webView.getSettings(),WebSettingsCompat.FORCE_DARK_ON);
+        }
+
+        if(url!=null) {
+            webView.loadUrl(url);
+        }
     }
     public void bookmark(View view){
         fab.setBackgroundResource(android.R.drawable.btn_star_big_on);

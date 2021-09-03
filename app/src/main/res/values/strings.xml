@@ -6,5 +6,6 @@
     <string name="articleBundle">articleBundle</string>
     <string name="articleObject">articleObject</string>
     <string name="dayNightTheme">dayNightTheme</string>
+    <string name="share_news">Share News</string>
 
 </resources>
