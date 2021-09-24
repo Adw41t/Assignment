@@ -30,6 +30,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.FirebaseDatabase;
 import com.projects.assignment.R;
+import com.projects.assignment.databinding.ActivityNewsBinding;
 import com.projects.assignment.models.Article;
 import com.projects.assignment.models.news;
 
@@ -52,13 +53,16 @@ public class NewsActivity extends AppCompatActivity {
     Article article;
     SharedPreferences sharep;
     boolean isDayMode;
+    private ActivityNewsBinding binding;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_news);
-        fab=(ImageButton) findViewById(R.id.ib_bookmark);
+        binding = ActivityNewsBinding.inflate(getLayoutInflater());
+        View view = binding.getRoot();
+        setContentView(view);
+        fab=(ImageButton) binding.ibBookmark;
         fab.setBackgroundResource(android.R.drawable.btn_star_big_off);
-        progressBar_newsWebView=findViewById(R.id.progress_news_webview);
+        progressBar_newsWebView = binding.progressNewsWebview;
         sharep = PreferenceManager.getDefaultSharedPreferences(this);
         isDayMode = sharep.getBoolean(getString(R.string.dayNightTheme),true);
         in=getIntent();
@@ -76,7 +80,7 @@ public class NewsActivity extends AppCompatActivity {
             fab.setEnabled(false);
         }
 
-        webView = (WebView) findViewById(R.id.webview);
+        webView = (WebView) binding.webview;
         webView.getSettings().setAppCacheMaxSize( 5 * 1024 * 1024 ); // 5MB
         webView.getSettings().setAppCachePath( getApplicationContext().getCacheDir().getAbsolutePath() );
         webView.getSettings().setAppCacheEnabled( true );
@@ -84,7 +88,9 @@ public class NewsActivity extends AppCompatActivity {
         webView.setWebViewClient(new MyWebViewClient());
         webView.setWebChromeClient(new WebChromeClient() {
             public void onProgressChanged(WebView view, int progress) {
-                progressBar_newsWebView.setProgress(progress);
+                if(progressBar_newsWebView!=null) {
+                    progressBar_newsWebView.setProgress(progress);
+                }
             }
         });
         webView.getSettings().setCacheMode( WebSettings.LOAD_DEFAULT ); // load online by default
@@ -122,6 +128,14 @@ public class NewsActivity extends AppCompatActivity {
                     }
                 });
             }
+        }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if(progressBar_newsWebView!=null){
+            progressBar_newsWebView.setVisibility(View.GONE);
         }
     }
 

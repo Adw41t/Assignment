@@ -9,14 +9,9 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
-
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.app.AppCompatDelegate;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 
 import com.firebase.ui.auth.AuthUI;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -30,11 +25,18 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.projects.assignment.R;
 import com.projects.assignment.adapters.NewsRecyclerAdapter;
+import com.projects.assignment.databinding.ActivityUserBinding;
 import com.projects.assignment.models.Article;
 import com.projects.assignment.models.news;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatDelegate;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 public class UserActivity extends AppCompatActivity {
     FirebaseUser u;
@@ -45,15 +47,18 @@ public class UserActivity extends AppCompatActivity {
     String uid,name;
     SharedPreferences sharep;
     SharedPreferences.Editor edit;
+    private ActivityUserBinding binding;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_user);
+        binding = ActivityUserBinding.inflate(getLayoutInflater());
+        View view = binding.getRoot();
+        setContentView(view);
         sharep = PreferenceManager.getDefaultSharedPreferences(this);
         edit = sharep.edit();
 
-        recyclerView=(RecyclerView) findViewById(R.id.user_RecyclerNews);
+        recyclerView=(RecyclerView) binding.userRecyclerNews;
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         if(isNetworkAvailable()) {
             u = FirebaseAuth.getInstance().getCurrentUser();
@@ -69,7 +74,7 @@ public class UserActivity extends AppCompatActivity {
             uid = sharep.getString(getString(R.string.id), "123");
             name = sharep.getString(getString(R.string.name), "User");
         }
-        TextView t=(TextView)findViewById(R.id.welcome);
+        TextView t=(TextView)binding.welcome;
         t.setText("Welcome "+name+" !!");
         list=new ArrayList<Article>();
         d=FirebaseDatabase.getInstance().getReference();

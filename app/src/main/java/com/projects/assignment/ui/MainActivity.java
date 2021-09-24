@@ -7,13 +7,8 @@ import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.Toast;
-
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.app.AppCompatDelegate;
-import androidx.appcompat.widget.Toolbar;
-import androidx.viewpager2.widget.ViewPager2;
 
 import com.firebase.ui.auth.AuthUI;
 import com.firebase.ui.auth.IdpResponse;
@@ -26,11 +21,17 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.FirebaseDatabase;
 import com.projects.assignment.R;
 import com.projects.assignment.adapters.ViewPagerAdapter;
+import com.projects.assignment.databinding.ActivityMainBinding;
 import com.projects.assignment.utils.DepthPageTransformer;
 
 import java.util.Arrays;
 import java.util.List;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatDelegate;
+import androidx.appcompat.widget.Toolbar;
+import androidx.viewpager2.widget.ViewPager2;
 import dagger.hilt.android.AndroidEntryPoint;
 
 @AndroidEntryPoint
@@ -41,11 +42,14 @@ public class MainActivity extends AppCompatActivity {
     SharedPreferences sharep;
     SharedPreferences.Editor edit;
     static boolean calledAlready = false;
+    private ActivityMainBinding binding;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        binding = ActivityMainBinding.inflate(getLayoutInflater());
+        View view = binding.getRoot();
+        setContentView(view);
         if (!calledAlready)
         {
             FirebaseDatabase.getInstance().setPersistenceEnabled(true);
@@ -53,13 +57,13 @@ public class MainActivity extends AppCompatActivity {
         }
         sharep = PreferenceManager.getDefaultSharedPreferences(this);
         edit = sharep.edit();
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        Toolbar toolbar = (Toolbar) binding.toolbar;
         setSupportActionBar(toolbar);
-        ViewPager2 viewPager = (ViewPager2) findViewById(R.id.viewpager);
+        ViewPager2 viewPager = (ViewPager2) binding.viewpager;
         viewPager.setPageTransformer(new DepthPageTransformer());
         ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager(),getLifecycle());
         viewPager.setAdapter(adapter);
-        TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
+        TabLayout tabLayout = (TabLayout) binding.tabs;
         new TabLayoutMediator(tabLayout, viewPager,
                 (tab, position) -> tab.setText(adapter.title[position])
         ).attach();

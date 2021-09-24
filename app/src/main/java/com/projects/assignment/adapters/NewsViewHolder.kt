@@ -7,9 +7,6 @@ import android.os.Bundle
 import android.view.View
 import android.view.View.GONE
 import android.view.View.INVISIBLE
-import android.widget.ImageButton
-import android.widget.ImageView
-import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.DataSource
@@ -17,18 +14,19 @@ import com.bumptech.glide.load.engine.GlideException
 import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.target.Target
 import com.projects.assignment.R
+import com.projects.assignment.databinding.NewsListItemBinding
 import com.projects.assignment.models.Article
 import com.projects.assignment.ui.NewsActivity
 import java.text.SimpleDateFormat
 import java.util.*
 
-class NewsViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-    val newsImage=itemView.findViewById<ImageView>(R.id.news_list_item_image)
-    val newsTitle=itemView.findViewById<TextView>(R.id.news_list_item_title)
-    val newsDescription=itemView.findViewById<TextView>(R.id.news_list_item_description)
-    val newsSource=itemView.findViewById<TextView>(R.id.news_list_item_source)
-    val newsPublishedTime=itemView.findViewById<TextView>(R.id.news_list_item_time)
-    val newsShare=itemView.findViewById<ImageButton>(R.id.news_list_item_share)
+class NewsViewHolder(binding: NewsListItemBinding) : RecyclerView.ViewHolder(binding.root) {
+    val newsImage = binding.newsListItemImage
+    val newsTitle = binding.newsListItemTitle
+    val newsDescription = binding.newsListItemDescription
+    val newsSource = binding.newsListItemSource
+    val newsPublishedTime = binding.newsListItemTime
+    val newsShare = binding.newsListItemShare
     fun bindView(context: Context, article: Article){
         if(article.urlToImage!=null) {
             Glide.with(context)

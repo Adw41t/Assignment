@@ -1,10 +1,19 @@
 package com.projects.assignment.ui;
 
 import android.app.ProgressDialog;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+
+import com.projects.assignment.adapters.NewsRecyclerAdapter;
+import com.projects.assignment.databinding.FragmentTabBinding;
+import com.projects.assignment.models.Article;
+import com.projects.assignment.viewmodels.NewsViewModel;
+
+import java.util.List;
 
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
@@ -13,14 +22,6 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
-
-import com.projects.assignment.R;
-import com.projects.assignment.adapters.NewsRecyclerAdapter;
-import com.projects.assignment.models.Article;
-import com.projects.assignment.viewmodels.NewsViewModel;
-
-import java.util.List;
-
 import dagger.hilt.android.AndroidEntryPoint;
 
 @AndroidEntryPoint
@@ -33,6 +34,9 @@ public class TabFragment extends Fragment {
     NewsRecyclerAdapter adapter;
     NewsViewModel viewModel;
     ProgressDialog loading;
+    private FragmentTabBinding binding;
+    SharedPreferences sharep;
+    SharedPreferences.Editor edit;
     public static Fragment getInstance(int position,String title) {
         Bundle bundle = new Bundle();
         bundle.putInt("pos", position);
@@ -49,16 +53,17 @@ public class TabFragment extends Fragment {
             position = getArguments().getInt("pos");
             title=getArguments().getString("title");
         }
+        sharep = PreferenceManager.getDefaultSharedPreferences(getContext());
+        edit = sharep.edit();
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view=inflater.inflate(R.layout.fragment_tab, container, false);
-        ref=(SwipeRefreshLayout) view.findViewById(R.id.tab_fragment_swipeRefresh);
-
-        recyclerView=view.findViewById(R.id.recyclerNews);
-
+        binding = FragmentTabBinding.inflate(inflater, container, false);
+        View view = binding.getRoot();
+        ref=(SwipeRefreshLayout) binding.tabFragmentSwipeRefresh;
+        recyclerView = binding.recyclerNews;
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         viewModel= new ViewModelProvider(this).get(NewsViewModel.class);
         return view;
@@ -88,11 +93,18 @@ public class TabFragment extends Fragment {
 
     public void getHeadlinesForCategory(){
 
+        boolean getNews = true;
+        if (sharep!=null) {
+            getNews = checkIfTimeLessThanTenMinutes(sharep.getLong(title, System.currentTimeMillis()));
+        }
+        if(getNews && (sharep!=null && edit!=null)){
+            edit.putLong(title,System.currentTimeMillis()).commit();
+        }
         if(ref!=null){
             ref.setRefreshing(true);
         }
         loading = ProgressDialog.show(getContext(), "Please Wait...", null, true, true);
-        viewModel.getArticlesByCategory("in",title).observe(getViewLifecycleOwner(), new Observer<List<Article>>() {
+        viewModel.getArticlesByCategory("in",title, getNews).observe(getViewLifecycleOwner(), new Observer<List<Article>>() {
             @Override
             public void onChanged(List<Article> articles) {
                 if(loading!=null) {
@@ -107,5 +119,18 @@ public class TabFragment extends Fragment {
                 }
             }
         });
+    }
+
+    private boolean checkIfTimeLessThanTenMinutes(Long time){
+
+        long now = System.currentTimeMillis();
+        if((now - time)<1000){
+            //first time
+            return true;
+        }
+        else if(((now/60000) - (time/60000)) > 10 ){
+            return true;
+        }
+        return false;
     }
 }

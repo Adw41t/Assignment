@@ -52,8 +52,10 @@ class newsRepository @Inject constructor(
         return topHeadlinesLiveData
     }
 
-    fun getArticlesByCategory(country: String,category: String):LiveData<List<Article>>{
-        getTopHeadlines(country,category)
+    fun getArticlesByCategory(country : String, category : String , getNews : Boolean):LiveData<List<Article>>{
+        if(getNews) {
+            getTopHeadlines(country, category)
+        }
         return articleDao.getArticlesByCategory(category)
     }
     private fun persistInDb(headlines : topHeadlines){

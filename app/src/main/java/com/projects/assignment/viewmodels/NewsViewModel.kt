@@ -15,7 +15,7 @@ class NewsViewModel @ViewModelInject constructor(val newsRepository:newsReposito
         topHeadlinesLiveData=newsRepository.getTopHeadlinesLiveData()
     }
 
-    fun getArticlesByCategory(country: String,category: String):LiveData<List<Article>>{
-        return newsRepository.getArticlesByCategory(country,category)
+    fun getArticlesByCategory(country : String, category : String, getNews : Boolean):LiveData<List<Article>>{
+        return newsRepository.getArticlesByCategory(country, category, getNews)
     }
 }
